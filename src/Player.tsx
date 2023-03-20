@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@mui/material/Button';
+import Slider, { Settings } from 'react-slick';
+import './Player.css';
 
 class Page {
+  id: string;
+  imageUrl: string;
 
+  constructor(id: string, imageUrl: string) {
+    this.id = id;
+    this.imageUrl = imageUrl;
+  }
 }
 
 class Book {
+  id: string;
   pages: Page[];
 
-  constructor() {
+  constructor(id: string) {
+    this.id = id;
     this.pages = [];
   }
 }
@@ -22,16 +32,19 @@ class Player extends React.Component<PlayerProps> {
     currentBook: Book | null;
   }
 
+  inputRef = React.createRef<HTMLInputElement>();
+
   constructor(props: PlayerProps) {
     super(props);
     this.state = {
       books: [],
       currentBook: null,
     };
-  }
+}
 
   handleAddBook() {
-    this.setState({ books: this.state.books.concat([new Book()]) });
+    const bookId = this.state.books.length.toString();
+    this.setState({ books: this.state.books.concat([new Book(bookId)]) });
   }
 
   handleThumbnailClick(book: Book) {
@@ -40,7 +53,7 @@ class Player extends React.Component<PlayerProps> {
 
   renderThumbnail(book: Book) {
     return (
-      <div onClick={() => this.handleThumbnailClick(book)}>Thumbnail</div>
+      <div key={book.id} onClick={() => this.handleThumbnailClick(book)}>Thumbnail</div>
     );
   }
 
@@ -49,20 +62,53 @@ class Player extends React.Component<PlayerProps> {
   }
 
   handleAddPage() {
+    const input = this.inputRef.current;
+    input?.click();
+  }
+
+  handleFileSelected() {
     if (this.state.currentBook == null) {
       return;
     }
-    const pages = this.state.currentBook.pages.concat([new Page()]);
-    this.state.currentBook.pages = pages;
-    this.setState({ currentBook: this.state.currentBook });
+    const input = this.inputRef.current;
+    if (input == null || input.files == null) {
+      return;
+    }
+    const book = this.state.currentBook;
+    const pageId = book.pages.length.toString();
+    book.pages = book.pages.concat([new Page(pageId, URL.createObjectURL(input.files[0]))]);
+    this.setState({ currentBook: book });
   }
 
   renderPage(page: Page) {
     return (
-      <div>Page</div>
+      <div key={page.id}>
+        <img src={page.imageUrl} />
+      </div>
+    );
+  }
+
+  renderLastPage() {
+    return (
+      <div>
+        <input
+          accept='image/*' className='visually-hidden' type='file'
+          ref={this.inputRef}
+          onChange={() => this.handleFileSelected()} />
+        <Button variant="contained" onClick={() => this.handleAddPage()}>Add page</Button>
+      </div>
     );
   }
   
+  settings: Settings = {
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    arrows: false,
+  };
+
   render () {
     return (
       <div className="Player">
@@ -70,8 +116,10 @@ class Player extends React.Component<PlayerProps> {
           <div>
             <p>A selected book is shown.</p>
             <Button variant="contained" onClick={() => this.handleBack()}>Back</Button>
-            { this.state.currentBook.pages.map((page) => this.renderPage(page)) }
-            <Button variant="contained" onClick={() => this.handleAddPage()}>Add page</Button>
+            <Slider {...this.settings}>
+              { this.state.currentBook.pages.map((page) => this.renderPage(page)) }
+              { this.renderLastPage() }
+            </Slider>
           </div>
         ) : (
           <div>
