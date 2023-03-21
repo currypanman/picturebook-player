@@ -45,6 +45,7 @@ class Player extends React.Component<PlayerProps> {
   handleAddBook() {
     const bookId = this.state.books.length.toString();
     this.setState({ books: this.state.books.concat([new Book(bookId)]) });
+    localStorage.setItem('books', JSON.stringify(this.state.books));
   }
 
   handleThumbnailClick(book: Book) {
@@ -78,11 +79,12 @@ class Player extends React.Component<PlayerProps> {
     const pageId = book.pages.length.toString();
     book.pages = book.pages.concat([new Page(pageId, URL.createObjectURL(input.files[0]))]);
     this.setState({ currentBook: book });
+    localStorage.setItem('books', JSON.stringify(this.state.books));
   }
 
   renderPage(page: Page) {
     return (
-      <div key={page.id}>
+      <div key={page.id} className='page'>
         <img src={page.imageUrl} />
       </div>
     );
@@ -90,12 +92,16 @@ class Player extends React.Component<PlayerProps> {
 
   renderLastPage() {
     return (
-      <div>
+      <div className='page'>
         <input
-          accept='image/*' className='visually-hidden' type='file'
+          accept='image/*' capture='environment' className='visually-hidden' type='file'
           ref={this.inputRef}
           onChange={() => this.handleFileSelected()} />
-        <Button variant="contained" onClick={() => this.handleAddPage()}>Add page</Button>
+        <div>
+          <Button className='addPageButton' variant="contained" onClick={() => this.handleAddPage()}>
+            Add page
+          </Button>
+        </div>
       </div>
     );
   }
@@ -114,8 +120,9 @@ class Player extends React.Component<PlayerProps> {
       <div className="Player">
         { this.state.currentBook != null ? (
           <div>
-            <p>A selected book is shown.</p>
-            <Button variant="contained" onClick={() => this.handleBack()}>Back</Button>
+            <div className='backButton'>
+              <Button variant="contained" onClick={() => this.handleBack()}>Back</Button>
+            </div>
             <Slider {...this.settings}>
               { this.state.currentBook.pages.map((page) => this.renderPage(page)) }
               { this.renderLastPage() }
