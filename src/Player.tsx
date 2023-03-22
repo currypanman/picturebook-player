@@ -1,15 +1,18 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import Slider, { Settings } from 'react-slick';
+import { openDB } from 'idb';
 import './Player.css';
 
 class Page {
   id: string;
+  imageKey: IDBValidKey;
   imageUrl: string;
 
-  constructor(id: string, imageUrl: string) {
+  constructor(id: string, imageKey: IDBValidKey) {
     this.id = id;
-    this.imageUrl = imageUrl;
+    this.imageKey = imageKey;
+    this.imageUrl = '';
   }
 }
 
@@ -40,12 +43,54 @@ class Player extends React.Component<PlayerProps> {
       books: [],
       currentBook: null,
     };
-}
+  }
+
+  componentDidMount() {
+    this.loadBooks();
+  }
+
+  async loadBooks() {
+    const jsonBooks = localStorage.getItem('books');
+    if (jsonBooks == null) {
+      return;
+    }
+    const parsedBooks = JSON.parse(jsonBooks);
+    const books: Book[] = [];
+    for (const value of parsedBooks) {
+      const book = new Book(value.id);
+      Object.assign(book, value);
+      for (const page of book.pages) {
+        const imageFile = await this.getPageImage(page.imageKey);
+        page.imageUrl = URL.createObjectURL(imageFile);
+      }
+      books.push(book);
+    }
+    this.setState({ books: books });
+  }
+
+  async putPageImage(file: File) {
+    const db = await openDB('PicturebookPlayer', 1, {
+      upgrade(db) {
+        db.createObjectStore('PageImages', { autoIncrement: true });
+      },
+    });
+    const key = await db.add('PageImages', file);
+    db.close();
+    return key;
+  }
+
+  async getPageImage(key: IDBValidKey) {
+    const db = await openDB('PicturebookPlayer');
+    const file = await db.get('PageImages', key);
+    db.close();
+    return file;
+  }
 
   handleAddBook() {
     const bookId = this.state.books.length.toString();
-    this.setState({ books: this.state.books.concat([new Book(bookId)]) });
-    localStorage.setItem('books', JSON.stringify(this.state.books));
+    this.setState({ books: this.state.books.concat([new Book(bookId)]) }, () => {
+      localStorage.setItem('books', JSON.stringify(this.state.books));
+    });
   }
 
   handleThumbnailClick(book: Book) {
@@ -67,6 +112,20 @@ class Player extends React.Component<PlayerProps> {
     input?.click();
   }
 
+  async handlePutPageImageSucceeded(key: IDBValidKey) {
+    if (this.state.currentBook == null) {
+      return;
+    }
+    const book = this.state.currentBook;
+    const pageId = book.pages.length.toString();
+    const file = await this.getPageImage(key);
+    const page = new Page(pageId, key);
+    page.imageUrl = URL.createObjectURL(file);
+    book.pages = book.pages.concat([page]);
+    this.setState({ currentBook: book });
+    localStorage.setItem('books', JSON.stringify(this.state.books));
+  }
+
   handleFileSelected() {
     if (this.state.currentBook == null) {
       return;
@@ -75,11 +134,7 @@ class Player extends React.Component<PlayerProps> {
     if (input == null || input.files == null) {
       return;
     }
-    const book = this.state.currentBook;
-    const pageId = book.pages.length.toString();
-    book.pages = book.pages.concat([new Page(pageId, URL.createObjectURL(input.files[0]))]);
-    this.setState({ currentBook: book });
-    localStorage.setItem('books', JSON.stringify(this.state.books));
+    this.putPageImage(input.files[0]).then(this.handlePutPageImageSucceeded.bind(this));
   }
 
   renderPage(page: Page) {
