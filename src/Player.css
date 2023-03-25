@@ -35,3 +35,22 @@ input.visually-hidden:is(:focus, :focus-within) + label {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.thumbnail {
+  height: 20vw;
+  width: 20vw;
+  overflow: hidden;
+}
+
+.thumbnail > img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}

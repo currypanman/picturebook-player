@@ -88,9 +88,14 @@ class Player extends React.Component<PlayerProps> {
 
   handleAddBook() {
     const bookId = this.state.books.length.toString();
-    this.setState({ books: this.state.books.concat([new Book(bookId)]) }, () => {
-      localStorage.setItem('books', JSON.stringify(this.state.books));
-    });
+    const book = new Book(bookId);
+    this.setState(
+      {
+        books: this.state.books.concat([book]),
+        currentBook: book
+      },
+      () => { localStorage.setItem('books', JSON.stringify(this.state.books)); }
+    );
   }
 
   handleThumbnailClick(book: Book) {
@@ -99,7 +104,13 @@ class Player extends React.Component<PlayerProps> {
 
   renderThumbnail(book: Book) {
     return (
-      <div key={book.id} onClick={() => this.handleThumbnailClick(book)}>Thumbnail</div>
+      <div className='thumbnail' key={book.id} onClick={() => this.handleThumbnailClick(book)}>
+        { book.pages.length > 0 ? (
+          <img src={book.pages[0].imageUrl} />
+        ) : (
+          <p>Thumbnail</p>
+        ) }
+      </div>
     );
   }
 
@@ -184,8 +195,7 @@ class Player extends React.Component<PlayerProps> {
             </Slider>
           </div>
         ) : (
-          <div>
-            <p>Thumbnails are shown.</p>
+          <div className='thumbnails'>
             { this.state.books.map((book) => this.renderThumbnail(book)) }
             <Button variant="contained" onClick={() => this.handleAddBook()}>Add book</Button>
           </div>
