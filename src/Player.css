@@ -54,3 +54,9 @@ input.visually-hidden:is(:focus, :focus-within) + label {
   object-fit: cover;
   object-position: center;
 }
+
+.thumbnail > button {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

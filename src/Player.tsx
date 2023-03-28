@@ -108,7 +108,7 @@ class Player extends React.Component<PlayerProps> {
         { book.pages.length > 0 ? (
           <img src={book.pages[0].imageUrl} />
         ) : (
-          <p>Thumbnail</p>
+          <p>No page</p>
         ) }
       </div>
     );
@@ -197,7 +197,9 @@ class Player extends React.Component<PlayerProps> {
         ) : (
           <div className='thumbnails'>
             { this.state.books.map((book) => this.renderThumbnail(book)) }
-            <Button variant="contained" onClick={() => this.handleAddBook()}>Add book</Button>
+            <div className='thumbnail'>
+              <Button variant="contained" onClick={() => this.handleAddBook()}>Add book</Button>
+            </div>
           </div>
         ) }
       </div>
