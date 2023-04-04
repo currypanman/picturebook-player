@@ -1,46 +1,25 @@
-# Getting Started with Create React App
+# クマさんといっしょにえほんをよもう!
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+普段家庭で読んでいる絵本をタブレットで撮影しておくことにより、外出先などでも読めるようにするアプリです。
 
-## Available Scripts
+# (これから)実装する機能
 
-In the project directory, you can run:
+## 絵本撮影機能
 
-### `npm start`
+タブレットについているカメラで絵本の各ページを撮影すると絵本をタブレットに取り込むことができます。
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 絵本閲覧機能
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+取り込んだ絵本は一覧表示されます。読みたい絵本を選ぶとページをめくりながら読むことができます。単純にスクロールするのではなくカルーセルを使っていますのでページめくりの感覚も楽しめます。
 
-### `npm test`
+## 編集機能
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+撮影した絵本の削除や写真の取り直しなどができます。あまり凝った編集はできませんが、クロップなどの簡単な編集機能も提供します。
 
-### `npm run build`
+## 録音機能
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+保護者の方が各ページで録音ボタンを押すことにより、絵本の読み上げを録音することができます。
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 楽しい演出
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+オープニングのアニメーションや絵本の一覧表示などでクマさんなどのアニメーションが見られます。取り込んだ絵本を最後まで読み終わるとクマさんらがほめてくれ、プレゼントをもらえます。プレゼントはコレクションできます。
