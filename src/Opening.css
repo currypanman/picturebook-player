@@ -1,0 +1,35 @@
+.opening-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.opening-logo {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.opening-logo span {
+}
+
+.opening-header {
+  display: flex;
+  position: absolute;
+  font-size: 48px;
+  text-align: center;
+  top: calc(30% - 50px);
+  left: 100vw;
+  height: 100px;
+  width: 650px;
+}
+
+.opening-bear {
+  position: absolute;
+  top: 100vh;
+  left: calc(50% - 150px);
+  width: 300px;
+}
