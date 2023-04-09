@@ -11,11 +11,13 @@ function Opening(props: OpeningProps) {
   const bear = React.createRef<HTMLImageElement>();
 
   useEffect(() => {
-    const tl = gsap.timeline({
-      onComplete: props.onAnimationComplete
-    });
+    const tl = gsap.timeline({ onComplete: props.onAnimationComplete });
     tl.to('.opening-header span', {x:-325 - window.innerWidth / 2, duration: 0.3, stagger: 0.3});
     tl.to(bear.current, {y:-400, duration: 1});
+    return () => {
+      tl.eventCallback('onComplete', null);
+      tl.clear();
+    };
   }, [header, bear]);
 
   return (

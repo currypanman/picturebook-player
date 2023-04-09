@@ -3,26 +3,35 @@ import { Opening } from './Opening';
 import { Player } from './Player';
 import './App.css';
 
-enum State {
+enum View {
   Opening,
   BookList,
   Book,
 }
 
 function App() {
-  const [state, setState] = useState(State.Opening);
+  const [view, setView] = useState(View.Opening);
+  const [opacity, setOpacity] = useState(1);
 
-  switch (state) {
-    case State.Opening:
+  function changeView(newView: View) {
+    setOpacity(0);
+    setTimeout(() => {
+      setView(newView);
+      setOpacity(1);
+    }, 1000);
+  }
+
+  switch (view) {
+    case View.Opening:
       return (
-        <div className="App">
-          <Opening onAnimationComplete={() => setState(State.Book)}/>
+        <div className="App" style={{opacity: opacity}}>
+          <Opening onAnimationComplete={() => changeView(View.Book)}/>
         </div>
       );
-    case State.BookList:
-    case State.Book:
+    case View.BookList:
+    case View.Book:
       return (
-        <div className="App">
+        <div className="App" style={{opacity: opacity}}>
           <Player />
         </div>
       );
