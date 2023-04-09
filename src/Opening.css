@@ -5,31 +5,48 @@
   position: relative;
 }
 
+.opening-logo span {
+  font-weight: bold;
+}
+
+.opening-logo-blue {
+  -webkit-text-stroke: 2px blue;
+  color: lightblue;
+}
+
+.opening-logo-pink {
+  -webkit-text-stroke: 2px coral;
+  color: lightpink;
+}
+
+.opening-logo-green {
+  -webkit-text-stroke: 2px green;
+  color: lightgreen;
+}
+
 .opening-logo {
   display: flex;
   position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-}
-
-.opening-logo span {
-}
-
-.opening-header {
-  display: flex;
-  position: absolute;
-  font-size: 48px;
+  font-size: 64px;
   text-align: center;
   top: calc(30% - 50px);
   left: 100vw;
   height: 100px;
-  width: 650px;
+  width: 850px;
 }
 
 .opening-bear {
   position: absolute;
   top: 100vh;
-  left: calc(50% - 150px);
+  left: calc(35% - 150px);
   width: 300px;
+  z-index: 1;
+}
+
+.opening-bookshelf {
+  position: absolute;
+  top: 50%;
+  height: 50%;
+  right: 0;
+  z-index: 0;
 }

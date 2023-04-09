@@ -12,7 +12,7 @@ function Opening(props: OpeningProps) {
 
   useEffect(() => {
     const tl = gsap.timeline({ onComplete: props.onAnimationComplete });
-    tl.to('.opening-header span', {x:-325 - window.innerWidth / 2, duration: 0.3, stagger: 0.3});
+    tl.to('.opening-logo span', {x:-425 - window.innerWidth / 2, duration: 0.3, stagger: 0.3});
     tl.to(bear.current, {y:-400, duration: 1});
     return () => {
       tl.eventCallback('onComplete', null);
@@ -22,15 +22,17 @@ function Opening(props: OpeningProps) {
 
   return (
     <div className="opening-container">
-      <h1 className="opening-header" ref={header}>
-        <span>クマさんと</span>
+      <h1 className="opening-logo" ref={header}>
+        <span className="opening-logo-blue">クマさんと</span>
         <span>&nbsp;</span>
-        <span>えほんを</span>
+        <span className="opening-logo-pink">えほんを</span>
         <span>&nbsp;</span>
-        <span>よもう!</span>
+        <span className="opening-logo-green">よもう!</span>
       </h1>
       <img className="opening-bear" ref={bear}
         src={`${process.env.PUBLIC_URL}/present_kuma.png`} />
+      <img className="opening-bookshelf"
+        src={`${process.env.PUBLIC_URL}/tosyokan_book_tana.png`} />
     </div>
   );
 }
