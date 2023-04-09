@@ -1,3 +1,3 @@
 .App {
-  transition: opacity 1s 0s linear;
+  transition: opacity 500ms 0s linear;
 }
