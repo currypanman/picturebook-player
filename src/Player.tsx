@@ -1,30 +1,8 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import Slider, { Settings } from 'react-slick';
-import { openDB } from 'idb';
 import './Player.css';
-
-class Page {
-  id: string;
-  imageKey: IDBValidKey;
-  imageUrl: string;
-
-  constructor(id: string, imageKey: IDBValidKey) {
-    this.id = id;
-    this.imageKey = imageKey;
-    this.imageUrl = '';
-  }
-}
-
-class Book {
-  id: string;
-  pages: Page[];
-
-  constructor(id: string) {
-    this.id = id;
-    this.pages = [];
-  }
-}
+import { Book, Page, BookController } from './BookController';
 
 class PlayerProps {
 }
@@ -36,6 +14,7 @@ class Player extends React.Component<PlayerProps> {
   }
 
   inputRef = React.createRef<HTMLInputElement>();
+  controller = new BookController();
 
   constructor(props: PlayerProps) {
     super(props);
@@ -46,56 +25,22 @@ class Player extends React.Component<PlayerProps> {
   }
 
   componentDidMount() {
-    this.loadBooks();
+    this.controller.init().then(() => {
+      this.loadBooks();
+    });
   }
 
   async loadBooks() {
-    const jsonBooks = localStorage.getItem('books');
-    if (jsonBooks == null) {
-      return;
-    }
-    const parsedBooks = JSON.parse(jsonBooks);
-    const books: Book[] = [];
-    for (const value of parsedBooks) {
-      const book = new Book(value.id);
-      Object.assign(book, value);
-      for (const page of book.pages) {
-        const imageFile = await this.getPageImage(page.imageKey);
-        page.imageUrl = URL.createObjectURL(imageFile);
-      }
-      books.push(book);
+    const books: Book[] = await this.controller.getAll();
+    for (const book of books) {
+      await this.controller.loadPageImages(book);
     }
     this.setState({ books: books });
   }
 
-  async putPageImage(file: File) {
-    const db = await openDB('PicturebookPlayer', 1, {
-      upgrade(db) {
-        db.createObjectStore('PageImages', { autoIncrement: true });
-      },
-    });
-    const key = await db.add('PageImages', file);
-    db.close();
-    return key;
-  }
-
-  async getPageImage(key: IDBValidKey) {
-    const db = await openDB('PicturebookPlayer');
-    const file = await db.get('PageImages', key);
-    db.close();
-    return file;
-  }
-
-  handleAddBook() {
-    const bookId = this.state.books.length.toString();
-    const book = new Book(bookId);
-    this.setState(
-      {
-        books: this.state.books.concat([book]),
-        currentBook: book
-      },
-      () => { localStorage.setItem('books', JSON.stringify(this.state.books)); }
-    );
+  async handleAddBook() {
+    const book = await this.controller.create([]);
+    this.setState({ currentBook: book });
   }
 
   handleThumbnailClick(book: Book) {
@@ -114,8 +59,9 @@ class Player extends React.Component<PlayerProps> {
     );
   }
 
-  handleBack() {
-    this.setState({ currentBook: null });
+  async handleBack() {
+    const books: Book[] = await this.controller.getAll();
+    this.setState({ books: books, currentBook: null });
   }
 
   handleAddPage() {
@@ -123,21 +69,7 @@ class Player extends React.Component<PlayerProps> {
     input?.click();
   }
 
-  async handlePutPageImageSucceeded(key: IDBValidKey) {
-    if (this.state.currentBook == null) {
-      return;
-    }
-    const book = this.state.currentBook;
-    const pageId = book.pages.length.toString();
-    const file = await this.getPageImage(key);
-    const page = new Page(pageId, key);
-    page.imageUrl = URL.createObjectURL(file);
-    book.pages = book.pages.concat([page]);
-    this.setState({ currentBook: book });
-    localStorage.setItem('books', JSON.stringify(this.state.books));
-  }
-
-  handleFileSelected() {
+  async handleFileSelected() {
     if (this.state.currentBook == null) {
       return;
     }
@@ -145,12 +77,13 @@ class Player extends React.Component<PlayerProps> {
     if (input == null || input.files == null) {
       return;
     }
-    this.putPageImage(input.files[0]).then(this.handlePutPageImageSucceeded.bind(this));
+    await this.controller.addPage(this.state.currentBook, input.files[0]);
+    this.setState({ currentBook: this.state.currentBook });
   }
 
   renderPage(page: Page) {
     return (
-      <div key={page.id} className='page'>
+      <div key={page.imageKey} className='page'>
         <img src={page.imageUrl} />
       </div>
     );
